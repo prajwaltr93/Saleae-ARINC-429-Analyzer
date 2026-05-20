@@ -1,17 +1,17 @@
-#ifndef SIMPLESERIAL_ANALYZER_H
-#define SIMPLESERIAL_ANALYZER_H
+#ifndef ARINC429_ANALYZER_H
+#define ARINC429_ANALYZER_H
 
 #include <Analyzer.h>
-#include "SimpleSerialAnalyzerSettings.h"
-#include "SimpleSerialAnalyzerResults.h"
-#include "SimpleSerialSimulationDataGenerator.h"
+#include "ARINC429AnalyzerSettings.h"
+#include "ARINC429AnalyzerResults.h"
+#include "ARINC429SimulationDataGenerator.h"
 #include <memory>
 
-class ANALYZER_EXPORT SimpleSerialAnalyzer : public Analyzer2
+class ANALYZER_EXPORT ARINC429Analyzer : public Analyzer2
 {
 public:
-	SimpleSerialAnalyzer();
-	virtual ~SimpleSerialAnalyzer();
+	ARINC429Analyzer();
+	virtual ~ARINC429Analyzer();
 
 	virtual void SetupResults();
 	virtual void WorkerThread();
@@ -23,11 +23,11 @@ public:
 	virtual bool NeedsRerun();
 
 protected: //vars
-	SimpleSerialAnalyzerSettings mSettings;
-	std::unique_ptr<SimpleSerialAnalyzerResults> mResults;
+	ARINC429AnalyzerSettings mSettings;
+	std::unique_ptr<ARINC429AnalyzerResults> mResults;
 	AnalyzerChannelData* mSerial;
 
-	SimpleSerialSimulationDataGenerator mSimulationDataGenerator;
+	ARINC429SimulationDataGenerator mSimulationDataGenerator;
 	bool mSimulationInitilized;
 };
 
@@ -35,4 +35,4 @@ extern "C" ANALYZER_EXPORT const char* __cdecl GetAnalyzerName();
 extern "C" ANALYZER_EXPORT Analyzer* __cdecl CreateAnalyzer( );
 extern "C" ANALYZER_EXPORT void __cdecl DestroyAnalyzer( Analyzer* analyzer );
 
-#endif //SIMPLESERIAL_ANALYZER_H
+#endif //ARINC429_ANALYZER_H

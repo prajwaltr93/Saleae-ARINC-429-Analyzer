@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.13)
 
-project(SimpleSerialAnalyzer)
+project(ARINC429Analyzer)
 
 add_definitions( -DLOGIC2 )
 
@@ -15,14 +15,14 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(ExternalAnalyzerSDK)
 
 set(SOURCES 
-src/SimpleSerialAnalyzer.cpp
-src/SimpleSerialAnalyzer.h
-src/SimpleSerialAnalyzerResults.cpp
-src/SimpleSerialAnalyzerResults.h
-src/SimpleSerialAnalyzerSettings.cpp
-src/SimpleSerialAnalyzerSettings.h
-src/SimpleSerialSimulationDataGenerator.cpp
-src/SimpleSerialSimulationDataGenerator.h
+src/ARINC429Analyzer.cpp
+src/ARINC429Analyzer.h
+src/ARINC429AnalyzerResults.cpp
+src/ARINC429AnalyzerResults.h
+src/ARINC429AnalyzerSettings.cpp
+src/ARINC429AnalyzerSettings.h
+src/ARINC429SimulationDataGenerator.cpp
+src/ARINC429SimulationDataGenerator.h
 )
 
 add_analyzer_plugin(${PROJECT_NAME} SOURCES ${SOURCES})

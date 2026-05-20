@@ -1,8 +1,8 @@
-#include "SimpleSerialAnalyzer.h"
-#include "SimpleSerialAnalyzerSettings.h"
+#include "ARINC429Analyzer.h"
+#include "ARINC429AnalyzerSettings.h"
 #include <AnalyzerChannelData.h>
 
-SimpleSerialAnalyzer::SimpleSerialAnalyzer()
+ARINC429Analyzer::ARINC429Analyzer()
 :	Analyzer2(),  
 	mSettings(),
 	mSimulationInitilized( false )
@@ -10,20 +10,20 @@ SimpleSerialAnalyzer::SimpleSerialAnalyzer()
 	SetAnalyzerSettings( &mSettings );
 }
 
-SimpleSerialAnalyzer::~SimpleSerialAnalyzer()
+ARINC429Analyzer::~ARINC429Analyzer()
 {
 	KillThread();
 }
 
-void SimpleSerialAnalyzer::SetupResults()
+void ARINC429Analyzer::SetupResults()
 {
 	// SetupResults is called each time the analyzer is run. Because the same instance can be used for multiple runs, we need to clear the results each time.
-	mResults.reset(new SimpleSerialAnalyzerResults( this, &mSettings ));
+	mResults.reset(new ARINC429AnalyzerResults( this, &mSettings ));
 	SetAnalyzerResults( mResults.get() );
 	mResults->AddChannelBubblesWillAppearOn( mSettings.mInputChannel );
 }
 
-void SimpleSerialAnalyzer::WorkerThread()
+void ARINC429Analyzer::WorkerThread()
 {
 	U32 sample_rate_hz = GetSampleRate();
 
@@ -73,12 +73,12 @@ void SimpleSerialAnalyzer::WorkerThread()
 	}
 }
 
-bool SimpleSerialAnalyzer::NeedsRerun()
+bool ARINC429Analyzer::NeedsRerun()
 {
 	return false;
 }
 
-U32 SimpleSerialAnalyzer::GenerateSimulationData( U64 minimum_sample_index, U32 device_sample_rate, SimulationChannelDescriptor** simulation_channels )
+U32 ARINC429Analyzer::GenerateSimulationData( U64 minimum_sample_index, U32 device_sample_rate, SimulationChannelDescriptor** simulation_channels )
 {
 	if( mSimulationInitilized == false )
 	{
@@ -89,24 +89,24 @@ U32 SimpleSerialAnalyzer::GenerateSimulationData( U64 minimum_sample_index, U32 
 	return mSimulationDataGenerator.GenerateSimulationData( minimum_sample_index, device_sample_rate, simulation_channels );
 }
 
-U32 SimpleSerialAnalyzer::GetMinimumSampleRateHz()
+U32 ARINC429Analyzer::GetMinimumSampleRateHz()
 {
 	return mSettings.mBitRate * 4;
 }
 
-const char* SimpleSerialAnalyzer::GetAnalyzerName() const
+const char* ARINC429Analyzer::GetAnalyzerName() const
 {
-	return "Simple Serial";
+	return "ARINC 429";
 }
 
 const char* GetAnalyzerName()
 {
-	return "Simple Serial";
+	return "ARINC 429";
 }
 
 Analyzer* CreateAnalyzer()
 {
-	return new SimpleSerialAnalyzer();
+	return new ARINC429Analyzer();
 }
 
 void DestroyAnalyzer( Analyzer* analyzer )
