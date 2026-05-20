@@ -20,52 +20,72 @@ void ARINC429Analyzer::SetupResults()
 	// SetupResults is called each time the analyzer is run. Because the same instance can be used for multiple runs, we need to clear the results each time.
 	mResults.reset(new ARINC429AnalyzerResults( this, &mSettings ));
 	SetAnalyzerResults( mResults.get() );
-	mResults->AddChannelBubblesWillAppearOn( mSettings.mInputChannel );
+	mResults->AddChannelBubblesWillAppearOn( mSettings.mA429InputPositive );
+	mResults->AddChannelBubblesWillAppearOn( mSettings.mA429InputNegative );
 }
 
 void ARINC429Analyzer::WorkerThread()
 {
 	U32 sample_rate_hz = GetSampleRate();
+    U64 first_sample_number = 0U;
 
-	mSerial = GetAnalyzerChannelData( mSettings.mInputChannel );
+	mA429PositiveChannelData = GetAnalyzerChannelData( mSettings.mA429InputPositive );
+	mA429NegativeChannelData = GetAnalyzerChannelData( mSettings.mA429InputNegative );
 
-	if( mSerial->GetBitState() == BIT_LOW )
-		mSerial->AdvanceToNextEdge();
+	if( mA429PositiveChannelData->GetBitState() == BIT_LOW )
+		mA429PositiveChannelData->AdvanceToNextEdge();
 
-	U32 samples_per_bit = sample_rate_hz / mSettings.mBitRate;
-	U32 samples_to_first_center_of_first_data_bit = U32( 1.5 * double( sample_rate_hz ) / double( mSettings.mBitRate ) );
+	first_sample_number = mA429PositiveChannelData->GetSampleNumber();
+
+	if( mA429NegativeChannelData->GetBitState() == BIT_LOW )
+		mA429NegativeChannelData->AdvanceToNextEdge();
+
+	if( first_sample_number < mA429NegativeChannelData->GetSampleNumber() )
+    {
+        /* we have moved too far on negative channel, rolling back to first edge on positive channel */
+        mA429NegativeChannelData->AdvanceToAbsPosition(first_sample_number);
+	}
+    else
+    {
+        /* we have moved too far on positive channel, rolling back to first edge on negative channel */
+        mA429PositiveChannelData->AdvanceToAbsPosition(mA429NegativeChannelData->GetSampleNumber());
+	}
+
+	U32 samples_per_half_cycle = sample_rate_hz / (mSettings.mA429DataRate * 1000U); // Kilo Hz, / 2 is to arrive at half bit time
+
+	/* first move only half a cycle to get to mid point of first data bit */
+	mA429PositiveChannelData->Advance( samples_per_half_cycle / 2U);
+	mA429NegativeChannelData->Advance( samples_per_half_cycle / 2U);
 
 	for( ; ; )
 	{
-		U8 data = 0;
+		U32 data = 0;
 		U8 mask = 1 << 7;
-		
-		mSerial->AdvanceToNextEdge(); //falling edge -- beginning of the start bit
 
-		U64 starting_sample = mSerial->GetSampleNumber();
-
-		mSerial->Advance( samples_to_first_center_of_first_data_bit );
-
-		for( U32 i=0; i<8; i++ )
+		for( U32 i=0U; i<32U; i++ )
 		{
-			//let's put a dot exactly where we sample this bit:
-			mResults->AddMarker( mSerial->GetSampleNumber(), AnalyzerResults::Dot, mSettings.mInputChannel );
+			mResults->AddMarker( mA429PositiveChannelData->GetSampleNumber(), AnalyzerResults::Dot, mSettings.mA429InputPositive );
+			mResults->AddMarker( mA429NegativeChannelData->GetSampleNumber(), AnalyzerResults::Dot, mSettings.mA429InputNegative );
 
-			if( mSerial->GetBitState() == BIT_HIGH )
-				data |= mask;
-
-			mSerial->Advance( samples_per_bit );
-
-			mask = mask >> 1;
+			if( (mA429PositiveChannelData->GetBitState() == BIT_HIGH)  && (mA429NegativeChannelData->GetBitState() == BIT_LOW))
+            {
+                data |= ( 1U << ( 31 - i ) );
+            }
+            else
+            {
+                /* TODO: This is an ERROR, not a differential PAIR ! */
+			}
+		
+			mA429PositiveChannelData->Advance( samples_per_half_cycle );
+			mA429NegativeChannelData->Advance( samples_per_half_cycle );
 		}
-
 
 		//we have a byte to save. 
 		Frame frame;
 		frame.mData1 = data;
 		frame.mFlags = 0;
-		frame.mStartingSampleInclusive = starting_sample;
-		frame.mEndingSampleInclusive = mSerial->GetSampleNumber();
+		frame.mStartingSampleInclusive = first_sample_number;
+		frame.mEndingSampleInclusive = mA429PositiveChannelData->GetSampleNumber();
 
 		mResults->AddFrame( frame );
 		mResults->CommitResults();
@@ -91,7 +111,7 @@ U32 ARINC429Analyzer::GenerateSimulationData( U64 minimum_sample_index, U32 devi
 
 U32 ARINC429Analyzer::GetMinimumSampleRateHz()
 {
-	return mSettings.mBitRate * 4;
+	return mSettings.mA429DataRate * 4;
 }
 
 const char* ARINC429Analyzer::GetAnalyzerName() const

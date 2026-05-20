@@ -25,7 +25,8 @@ public:
 protected: //vars
 	ARINC429AnalyzerSettings mSettings;
 	std::unique_ptr<ARINC429AnalyzerResults> mResults;
-	AnalyzerChannelData* mSerial;
+	AnalyzerChannelData* mA429PositiveChannelData;
+	AnalyzerChannelData* mA429NegativeChannelData;
 
 	ARINC429SimulationDataGenerator mSimulationDataGenerator;
 	bool mSimulationInitilized;

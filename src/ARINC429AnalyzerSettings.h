@@ -18,12 +18,12 @@ public:
 	
 	Channel mA429InputPositive;
 	Channel mA429InputNegative;
-	U32 mA429Speed;
+	U32 mA429DataRate;
 
 protected:
 	AnalyzerSettingInterfaceChannel	mA429InputPositiveInterface;
 	AnalyzerSettingInterfaceChannel	mA429InputNegativeInterface;
-    AnalyzerSettingInterfaceNumberList mA429SpeedInterface;
+    AnalyzerSettingInterfaceNumberList mA429DataRateInterface;
 };
 
 #endif //ARINC429_ANALYZER_SETTINGS
