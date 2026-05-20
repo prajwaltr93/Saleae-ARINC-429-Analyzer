@@ -13,7 +13,7 @@ ARINC429AnalyzerSettings::ARINC429AnalyzerSettings()
 	mA429InputPositiveInterface.SetTitleAndTooltip( "ARINC 429 Positive Line", "A429 Differential Pair Positive Line." );
 	mA429InputPositiveInterface.SetChannel( mA429InputPositive );
 
-	mA429InputNegativeInterface.SetTitleAndTooltip( "ARINC 429 Postive Line", "A429 Differential Pair Negative Line." );
+	mA429InputNegativeInterface.SetTitleAndTooltip( "ARINC 429 Negative Line", "A429 Differential Pair Negative Line." );
 	mA429InputNegativeInterface.SetChannel( mA429InputPositive );
 
 	mA429DataRateInterface.SetTitleAndTooltip( "ARINC 429 Data Rate",  "Specify the Data Rate of ARINC 429 in KHz." );
@@ -30,8 +30,8 @@ ARINC429AnalyzerSettings::ARINC429AnalyzerSettings()
 	AddExportExtension( 0, "csv", "csv" );
 
 	ClearChannels();
-	AddChannel( mA429InputPositive, "ARINC 429 Positive Line", false );
-	AddChannel( mA429InputPositive, "ARINC 429 Negative Line", false );
+	AddChannel( mA429InputPositive, "Positive Line", false );
+	AddChannel( mA429InputPositive, "Negative Line", false );
 }
 
 ARINC429AnalyzerSettings::~ARINC429AnalyzerSettings()
@@ -45,8 +45,8 @@ bool ARINC429AnalyzerSettings::SetSettingsFromInterfaces()
 	mA429DataRate = mA429DataRateInterface.GetNumber();
 
 	ClearChannels();
-	AddChannel( mA429InputPositive, "ARINC 429 Positive Line", true );
-	AddChannel( mA429InputPositive, "ARINC 429 Negative Line", true );
+	AddChannel( mA429InputPositive, "Positive Line", true );
+	AddChannel( mA429InputPositive, "Negative Line", true );
 
 	return true;
 }
@@ -68,8 +68,8 @@ void ARINC429AnalyzerSettings::LoadSettings( const char* settings )
 	text_archive >> mA429DataRate;
 
 	ClearChannels();
-	AddChannel( mA429InputPositive, "ARINC 429 Positive Line", true );
-	AddChannel( mA429InputPositive, "ARINC 429 Negative Line", true );
+	AddChannel( mA429InputPositive, "Positive Line", true );
+	AddChannel( mA429InputPositive, "Negative Line", true );
 
 	UpdateInterfacesFromSettings();
 }
