@@ -8,6 +8,7 @@ ARINC429Analyzer::ARINC429Analyzer()
 	mSimulationInitilized( false )
 {
 	SetAnalyzerSettings( &mSettings );
+    UseFrameV2();
 }
 
 ARINC429Analyzer::~ARINC429Analyzer()
@@ -87,6 +88,7 @@ void ARINC429Analyzer::WorkerThread()
             {
 				//we have a byte to save. 
 				Frame frame;
+                FrameV2 frame_v2;
 				frame.mFlags = 0;
 				frame.mStartingSampleInclusive = starting_sample_number;
 				/* TODO: not very accurate, fix this ! */
@@ -99,27 +101,38 @@ void ARINC429Analyzer::WorkerThread()
                     frame.mFlags |= ARINC429_MFLAGS_LABEL;
                     label = ( data & 0xFF000000U ) >> 24;
 					frame.mData1 = label;
+					frame_v2.AddInteger( "Data", label);
+					mResults->AddFrameV2( frame_v2, "Label", frame.mStartingSampleInclusive, frame.mEndingSampleInclusive);
                     break;
                 case 9U:
                     frame.mFlags |= ARINC429_MFLAGS_SDI;
                     SDI = ( (data & 0x00C00000U) >> 22);
 					frame.mData1 = SDI;
+					frame_v2.AddInteger( "Data", SDI );
+					mResults->AddFrameV2( frame_v2, "SDI", frame.mStartingSampleInclusive, frame.mEndingSampleInclusive);
                     break;
                 case 28U:
                     frame.mFlags |= ARINC429_MFLAGS_DATA;
 					frame.mData1 = (U32)((data & 0x003FFFF8U) >> 3);
+					frame_v2.AddInteger( "Data", frame.mData1 );
+					mResults->AddFrameV2( frame_v2, "Data", frame.mStartingSampleInclusive, frame.mEndingSampleInclusive);
                     break;
                 case 30U:
                     frame.mFlags |= ARINC429_MFLAGS_SSM;
                     SSM = ( (data & 0x00000006U) >> 1 );
 					frame.mData1 = SSM;
+					frame_v2.AddInteger( "Data", SSM );
+					mResults->AddFrameV2( frame_v2, "SSM", frame.mStartingSampleInclusive, frame.mEndingSampleInclusive);
                     break;
                 case 31U:
                     frame.mFlags |= ARINC429_MFLAGS_PARITY;
                     parity = ( data & 0x00000001U );
 					frame.mData1 = parity;
+					frame_v2.AddInteger( "Data", parity );
+					mResults->AddFrameV2( frame_v2, "Parity", frame.mStartingSampleInclusive, frame.mEndingSampleInclusive);
                     break;
 				}
+
 
 				/* Reset Data */
 				data = 0U;
