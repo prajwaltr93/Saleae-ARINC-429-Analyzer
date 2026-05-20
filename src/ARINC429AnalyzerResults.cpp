@@ -23,7 +23,25 @@ void ARINC429AnalyzerResults::GenerateBubbleText( U64 frame_index, Channel& chan
 
 	char number_str[128];
 	AnalyzerHelpers::GetNumberString( frame.mData1, display_base, 8, number_str, 128 );
-	AddResultString( number_str );
+
+	switch( frame.mFlags )
+    {
+    case ARINC429_MFLAGS_LABEL:
+		AddResultString( "Label: ", number_str );
+		break;
+    case ARINC429_MFLAGS_SDI:
+		AddResultString( "SDI: ", number_str );
+		break;
+    case ARINC429_MFLAGS_DATA:
+		AddResultString( "DATA: ", number_str );
+		break;
+    case ARINC429_MFLAGS_SSM:
+		AddResultString( "SSM: ", number_str );
+		break;
+    case ARINC429_MFLAGS_PARITY:
+		AddResultString( "PARITY: ", number_str );
+		break;
+	}
 }
 
 void ARINC429AnalyzerResults::GenerateExportFile( const char* file, DisplayBase display_base, U32 export_type_user_id )

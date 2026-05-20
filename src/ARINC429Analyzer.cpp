@@ -63,7 +63,8 @@ void ARINC429Analyzer::WorkerThread()
 
 	for( ; ; )
 	{
-		U32 data = 0;
+		U8 label = 0U, SSM = 0U, SDI = 0U, parity = 0U;
+        U32 data = 0U;
 		U8 mask = 1 << 7;
 
 		for( U32 i=0U; i<32U; i++ )
@@ -82,24 +83,57 @@ void ARINC429Analyzer::WorkerThread()
 		
 			ending_sample_number = mA429PositiveChannelData->GetSampleNumber();
 
+			if( i == 7 || i == 9 || i == 28 || i == 30 || i == 31 )
+            {
+				//we have a byte to save. 
+				Frame frame;
+				frame.mFlags = 0;
+				frame.mStartingSampleInclusive = starting_sample_number;
+				/* TODO: not very accurate, fix this ! */
+				frame.mEndingSampleInclusive = ending_sample_number + (samples_per_half_cycle / 15U); // Both channels have advanced to end position of current ARINC word, can use any one of them.
+				starting_sample_number = frame.mEndingSampleInclusive;
+
+				switch( i )
+                {
+                case 7U:
+                    frame.mFlags |= ARINC429_MFLAGS_LABEL;
+                    label = ( data & 0xFF000000U ) >> 24;
+					frame.mData1 = label;
+                    break;
+                case 9U:
+                    frame.mFlags |= ARINC429_MFLAGS_SDI;
+                    SDI = ( (data & 0x00C00000U) >> 22);
+					frame.mData1 = SDI;
+                    break;
+                case 28U:
+                    frame.mFlags |= ARINC429_MFLAGS_DATA;
+					frame.mData1 = (U32)((data & 0x003FFFF8U) >> 3);
+                    break;
+                case 30U:
+                    frame.mFlags |= ARINC429_MFLAGS_SSM;
+                    SSM = ( (data & 0x00000006U) >> 1 );
+					frame.mData1 = SSM;
+                    break;
+                case 31U:
+                    frame.mFlags |= ARINC429_MFLAGS_PARITY;
+                    parity = ( data & 0x00000001U );
+					frame.mData1 = parity;
+                    break;
+				}
+
+				/* Reset Data */
+				data = 0U;
+
+				mResults->AddFrame( frame );
+				mResults->CommitResults();
+				ReportProgress( frame.mEndingSampleInclusive );
+			}
+
 			mA429PositiveChannelData->Advance( samples_per_half_cycle );
 			mA429NegativeChannelData->Advance( samples_per_half_cycle );
+
 		}
 
-		//we have a byte to save. 
-		Frame frame;
-		frame.mData1 = data;
-		frame.mFlags = 0;
-		frame.mStartingSampleInclusive = starting_sample_number;
-		/* TODO: not very accurate, fix this ! */
-		frame.mEndingSampleInclusive = ending_sample_number + (samples_per_half_cycle / 15U); // Both channels have advanced to end position of current ARINC word, can use any one of them.
-
-		/* Reset Data */
-		data = 0U;
-
-		mResults->AddFrame( frame );
-		mResults->CommitResults();
-		ReportProgress( frame.mEndingSampleInclusive );
 
 		/* Scheduling Rate can be anything, although a minimum of 4 bit times is considered valid */
         /* TODO: revisit this idea */

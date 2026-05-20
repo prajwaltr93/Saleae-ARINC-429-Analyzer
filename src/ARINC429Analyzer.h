@@ -7,6 +7,12 @@
 #include "ARINC429SimulationDataGenerator.h"
 #include <memory>
 
+#define ARINC429_MFLAGS_LABEL    	(1U << 0)
+#define ARINC429_MFLAGS_SDI			(1U << 1)
+#define ARINC429_MFLAGS_DATA		(1U << 2)
+#define ARINC429_MFLAGS_SSM			(1U << 3)
+#define ARINC429_MFLAGS_PARITY      (1U << 4)
+
 class ANALYZER_EXPORT ARINC429Analyzer : public Analyzer2
 {
 public:
