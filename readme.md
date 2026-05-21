@@ -2,7 +2,7 @@
 
 An ARINC-429 Low-Level Analyzer for Saleae Logic Analyzer.
 
-![ARINC 429 Analyzer](./Docs/ARINC-429-Analyzer.png)
+![ARINC 429 Analyzer](./docs/ARINC_429_Analyzer.png)
 
 # TODO 
 
