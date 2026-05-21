@@ -84,6 +84,7 @@ void ARINC429Analyzer::WorkerThread()
 		
 			ending_sample_number = mA429PositiveChannelData->GetSampleNumber();
 
+			/* Label || SDI || Data || SSM || Parity */
 			if( i == 7 || i == 9 || i == 28 || i == 30 || i == 31 )
             {
 				//we have a byte to save. 
@@ -150,6 +151,7 @@ void ARINC429Analyzer::WorkerThread()
 
 		/* Scheduling Rate can be anything, although a minimum of 4 bit times is considered valid */
         /* TODO: revisit this idea */
+		/* Move to next bit so we can advance to LOW and then find the next EDGE */
 		mA429PositiveChannelData->Advance( samples_per_half_cycle );
 		mA429NegativeChannelData->Advance( samples_per_half_cycle );
 
