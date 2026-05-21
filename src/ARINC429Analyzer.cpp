@@ -66,7 +66,6 @@ void ARINC429Analyzer::WorkerThread()
 	{
 		U8 label = 0U, SSM = 0U, SDI = 0U, parity = 0U;
         U32 data = 0U;
-		U8 mask = 1 << 7;
 
 		for( U32 i=0U; i<32U; i++ )
 		{
@@ -135,9 +134,6 @@ void ARINC429Analyzer::WorkerThread()
 				}
 
 
-				/* Reset Data */
-				data = 0U;
-
 				mResults->AddFrame( frame );
 				mResults->CommitResults();
 				ReportProgress( frame.mEndingSampleInclusive );
@@ -148,6 +144,8 @@ void ARINC429Analyzer::WorkerThread()
 
 		}
 
+		/* Reset Data */
+		data = 0U;
 
 		/* Scheduling Rate can be anything, although a minimum of 4 bit times is considered valid */
         /* TODO: revisit this idea */
