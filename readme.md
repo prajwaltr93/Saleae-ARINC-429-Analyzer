@@ -11,3 +11,4 @@ An ARINC-429 Low-Level Analyzer for Saleae Logic Analyzer.
 - [ ] Implement Sample Data Generator.
 - [ ] Implement Data Explorter i.e. CSV.
 - [ ] Implement Parity validation and update Tabular Data and indicate same on bubble.
+- [ ] Display Data in Hex and Octal and option to choose between the two formats.
