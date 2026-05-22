@@ -18,7 +18,7 @@ public:
 	
 	Channel mA429InputPositive;
 	Channel mA429InputNegative;
-	U32 mA429DataRate;
+	double mA429DataRate;
 
 protected:
 	AnalyzerSettingInterfaceChannel	mA429InputPositiveInterface;
