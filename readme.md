@@ -6,6 +6,12 @@ An ARINC-429 Low-Level Analyzer for Saleae Logic Analyzer.
 
 ![ARINC 429 Analyzer Settings](./docs/ARINC_429_Analyzer_Settings.png)
 
+
+1. View label, SDI, Data, SSM and Parity fields of each ARINC word.
+2. Works for all standard ARINC data rates i.e. 12.5, 50, 100 KHz/Kbps.
+3. Displays results in number of different formats Hex, Binary, ASCII, Decimal and AsciiHex.
+4. Updates tabular form for easy search.
+
 # TODO 
 
 - [x] Test different ARINC data rates.
