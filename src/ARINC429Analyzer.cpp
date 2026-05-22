@@ -33,34 +33,20 @@ void ARINC429Analyzer::WorkerThread()
 	mA429PositiveChannelData = GetAnalyzerChannelData( mSettings.mA429InputPositive );
 	mA429NegativeChannelData = GetAnalyzerChannelData( mSettings.mA429InputNegative );
 
-	if( mA429PositiveChannelData->GetBitState() == BIT_LOW )
-		mA429PositiveChannelData->AdvanceToNextEdge();
-
-	starting_sample_number = mA429PositiveChannelData->GetSampleNumber();
-
-	if( mA429NegativeChannelData->GetBitState() == BIT_LOW )
-		mA429NegativeChannelData->AdvanceToNextEdge();
-
-	if( starting_sample_number < mA429NegativeChannelData->GetSampleNumber() )
+	starting_sample_number = mA429PositiveChannelData->GetSampleOfNextEdge();
+    if( starting_sample_number > mA429NegativeChannelData->GetSampleOfNextEdge() )
     {
-        /* we have moved too far on negative channel, rolling back to first edge on positive channel */
-        mA429NegativeChannelData->AdvanceToAbsPosition(starting_sample_number);
-	}
-    else
-    {
-        /* we have moved too far on positive channel, rolling back to first edge on negative channel */
-        mA429PositiveChannelData->AdvanceToAbsPosition(mA429NegativeChannelData->GetSampleNumber());
-        starting_sample_number = mA429PositiveChannelData->GetSampleNumber();
+		starting_sample_number = mA429NegativeChannelData->GetSampleOfNextEdge();
 	}
 
+	mA429NegativeChannelData->AdvanceToAbsPosition(starting_sample_number);
+	mA429PositiveChannelData->AdvanceToAbsPosition(starting_sample_number);
+    
 	U32 samples_per_half_cycle = sample_rate_hz / (mSettings.mA429DataRate * 1000U); // Kilo Hz, / 2 is to arrive at half bit time
 
 	/* first move only half a cycle to get to mid point of first data bit */
 	mA429PositiveChannelData->Advance( samples_per_half_cycle / 2U);
 	mA429NegativeChannelData->Advance( samples_per_half_cycle / 2U);
-
-	//mResults->AddMarker( starting_sample_number, AnalyzerResults::Dot, mSettings.mA429InputPositive );
-	//mResults->AddMarker( starting_sample_number, AnalyzerResults::Dot, mSettings.mA429InputNegative );
 
 	for( ; ; )
 	{
@@ -141,7 +127,6 @@ void ARINC429Analyzer::WorkerThread()
 
 			mA429PositiveChannelData->Advance( samples_per_half_cycle );
 			mA429NegativeChannelData->Advance( samples_per_half_cycle );
-
 		}
 
 		/* Reset Data */
@@ -153,26 +138,14 @@ void ARINC429Analyzer::WorkerThread()
 		mA429PositiveChannelData->Advance( samples_per_half_cycle );
 		mA429NegativeChannelData->Advance( samples_per_half_cycle );
 
-		/* Find the next ARINC Word, and next starting_sample_number */
-		if( mA429PositiveChannelData->GetBitState() == BIT_LOW )
-			mA429PositiveChannelData->AdvanceToNextEdge();
-
-		starting_sample_number = mA429PositiveChannelData->GetSampleNumber();
-
-		if( mA429NegativeChannelData->GetBitState() == BIT_LOW )
-			mA429NegativeChannelData->AdvanceToNextEdge();
-
-		if( starting_sample_number < mA429NegativeChannelData->GetSampleNumber() )
+		starting_sample_number = mA429PositiveChannelData->GetSampleOfNextEdge();
+		if( starting_sample_number > mA429NegativeChannelData->GetSampleOfNextEdge() )
 		{
-			/* we have moved too far on negative channel, rolling back to first edge on positive channel */
-			mA429NegativeChannelData->AdvanceToAbsPosition(starting_sample_number);
+			starting_sample_number = mA429NegativeChannelData->GetSampleOfNextEdge();
 		}
-		else
-		{
-			/* we have moved too far on positive channel, rolling back to first edge on negative channel */
-			mA429PositiveChannelData->AdvanceToAbsPosition(mA429NegativeChannelData->GetSampleNumber());
-			starting_sample_number = mA429PositiveChannelData->GetSampleNumber();
-		}
+
+		mA429NegativeChannelData->AdvanceToAbsPosition(starting_sample_number);
+		mA429PositiveChannelData->AdvanceToAbsPosition(starting_sample_number);
 
 		/* first move only half a cycle to get to mid point of first data bit */
 		mA429PositiveChannelData->Advance( samples_per_half_cycle / 2U);

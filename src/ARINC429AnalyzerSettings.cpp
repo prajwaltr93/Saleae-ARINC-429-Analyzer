@@ -6,15 +6,15 @@ ARINC429AnalyzerSettings::ARINC429AnalyzerSettings()
 :   mA429InputPositive( UNDEFINED_CHANNEL ),
 	mA429InputNegative( UNDEFINED_CHANNEL ),
 	mA429DataRate( 50 ),
-	mA429InputNegativeInterface(),
 	mA429InputPositiveInterface(),
+	mA429InputNegativeInterface(),
 	mA429DataRateInterface()
 {
 	mA429InputPositiveInterface.SetTitleAndTooltip( "ARINC 429 Positive Line", "A429 Differential Pair Positive Line." );
 	mA429InputPositiveInterface.SetChannel( mA429InputPositive );
 
 	mA429InputNegativeInterface.SetTitleAndTooltip( "ARINC 429 Negative Line", "A429 Differential Pair Negative Line." );
-	mA429InputNegativeInterface.SetChannel( mA429InputPositive );
+	mA429InputNegativeInterface.SetChannel( mA429InputNegative );
 
 	mA429DataRateInterface.SetTitleAndTooltip( "ARINC 429 Data Rate",  "Specify the Data Rate of ARINC 429 in KHz." );
     mA429DataRateInterface.AddNumber( 12.5, "12.5 KHz", "12.5 KHz" );
@@ -31,7 +31,7 @@ ARINC429AnalyzerSettings::ARINC429AnalyzerSettings()
 
 	ClearChannels();
 	AddChannel( mA429InputPositive, "Positive Line", false );
-	AddChannel( mA429InputPositive, "Negative Line", false );
+	AddChannel( mA429InputNegative, "Negative Line", false );
 }
 
 ARINC429AnalyzerSettings::~ARINC429AnalyzerSettings()
@@ -46,7 +46,7 @@ bool ARINC429AnalyzerSettings::SetSettingsFromInterfaces()
 
 	ClearChannels();
 	AddChannel( mA429InputPositive, "Positive Line", true );
-	AddChannel( mA429InputPositive, "Negative Line", true );
+	AddChannel( mA429InputNegative, "Negative Line", true );
 
 	return true;
 }
@@ -69,7 +69,7 @@ void ARINC429AnalyzerSettings::LoadSettings( const char* settings )
 
 	ClearChannels();
 	AddChannel( mA429InputPositive, "Positive Line", true );
-	AddChannel( mA429InputPositive, "Negative Line", true );
+	AddChannel( mA429InputNegative, "Negative Line", true );
 
 	UpdateInterfacesFromSettings();
 }
