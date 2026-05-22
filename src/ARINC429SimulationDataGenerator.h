@@ -17,13 +17,13 @@ public:
 protected:
 	ARINC429AnalyzerSettings* mSettings;
 	U32 mSimulationSampleRateHz;
+    U32 mA429DataWord; /* start with some arbitrary number so it looks nice :) */
 
 protected:
-	void CreateSerialByte();
-	std::string mSerialText;
-	U32 mStringIndex;
-
-	SimulationChannelDescriptor mSerialSimulationData;
+	void CreateA429SimulationData(void);
+	SimulationChannelDescriptor *mA429SimulationDataPositive;
+	SimulationChannelDescriptor *mA429SimulationDataNegative;
+    SimulationChannelDescriptorGroup mA429SimulationDataGroup;
 
 };
 #endif //ARINC429_SIMULATION_DATA_GENERATOR
